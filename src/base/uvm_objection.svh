@@ -1142,15 +1142,12 @@ class uvm_test_done_objection extends uvm_objection;
 
   static function uvm_test_done_objection get();
     if(m_inst == null)
- `ifdef VERILATOR
-      m_inst = uvm_test_done_objection::type_id_create("run");
- `else
       m_inst = uvm_test_done_objection::type_id::create("run");
- `endif
     return m_inst;
   endfunction
 
 endclass
+uvm_test_done_objection uvm_test_done = uvm_test_done_objection::get();
 `endif // UVM_ENABLE_DEPRECATED_API
 
 
