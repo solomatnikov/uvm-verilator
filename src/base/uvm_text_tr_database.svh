@@ -114,9 +114,13 @@ class uvm_text_tr_database extends uvm_tr_database;
    // @uvm-accellera The details of this API are specific to the Accellera implementation, and are not being considered for contribution to 1800.2
    protected virtual function bit do_close_db();
       if (m_file != 0) begin
+`ifdef UVM_VERILATOR_TIMING
          fork // Needed because $fclose is a task
+`endif
             $fclose(m_file);
+`ifdef UVM_VERILATOR_TIMING
          join_none
+`endif
          m_filename_dap.unlock();
       end
       return 1;

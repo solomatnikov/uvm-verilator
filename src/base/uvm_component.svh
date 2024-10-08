@@ -3036,18 +3036,22 @@ function void uvm_component::m_set_cl_msg_args;
   string s_;
   process p_;
 	
+`ifdef UVM_VERILATOR_TIMING
   p_=process::self();
   if(p_!=null) 
 	  s_=p_.get_randstate();
   else
 	  `uvm_warning("UVM","run_test() invoked from a non process context")
+`endif
 
   m_set_cl_verb();
   m_set_cl_action();
   m_set_cl_sev();
   
+`ifdef UVM_VERILATOR_TIMING
   if(p_!=null) 
 	  p_.set_randstate(s_);
+`endif
 endfunction
 
 
@@ -3120,6 +3124,7 @@ function void uvm_component::m_set_cl_verb;
   end
   // do time based settings
   if(this == top) begin
+`ifdef UVM_VERILATOR_TIMING
     fork begin
       time last_time = 0;
       if (m_time_settings.size() > 0)
@@ -3141,6 +3146,7 @@ function void uvm_component::m_set_cl_verb;
         end
       end
     end join_none // fork begin
+`endif
   end
 endfunction
 
@@ -3300,6 +3306,7 @@ function void uvm_component::m_apply_verbosity_settings(uvm_phase phase);
             set_report_id_verbosity(m_verbosity_settings[i].id, m_verbosity_settings[i].verbosity);
       end
       else begin
+`ifdef UVM_VERILATOR_TIMING
         process p = process::self();
         string p_rand = p.get_randstate();
         fork begin
@@ -3315,6 +3322,7 @@ function void uvm_component::m_apply_verbosity_settings(uvm_phase phase);
             set_report_id_verbosity(setting.id, setting.verbosity);
         end join_none
         p.set_randstate(p_rand);
+`endif
       end
       // Remove after use
       m_verbosity_settings.delete(i);

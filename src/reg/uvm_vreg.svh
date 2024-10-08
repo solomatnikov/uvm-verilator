@@ -524,12 +524,14 @@ endfunction: add_field
 
 
 task uvm_vreg::XatomicX(bit on);
+`ifdef UVM_VERILATOR_TIMING
    if (on) this.atomic.get(1);
    else begin
       // Maybe a key was put back in by a spurious call to reset()
       void'(this.atomic.try_get(1));
       this.atomic.put(1);
    end
+`endif
 endtask: XatomicX
 
 
@@ -537,7 +539,9 @@ function void uvm_vreg::reset(string kind = "HARD");
    // Put back a key in the semaphore if it is checked out
    // in case a thread was killed during an operation
    void'(this.atomic.try_get(1));
+`ifdef UVM_VERILATOR_TIMING
    this.atomic.put(1);
+`endif
 endfunction: reset
 
 

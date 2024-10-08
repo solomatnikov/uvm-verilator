@@ -1448,7 +1448,9 @@ function void uvm_reg::reset(string kind = "HARD");
    // Put back a key in the semaphore if it is checked out
    // in case a thread was killed during an operation
    void'(m_atomic.try_get(1));
+`ifdef UVM_VERILATOR_TIMING
    m_atomic.put(1);
+`endif
    m_process = null;
    Xset_busyX(0);
 endfunction: reset
@@ -2450,18 +2452,24 @@ endtask: mirror
 
 task uvm_reg::XatomicX(bit on);
    process m_reg_process;
+`ifdef UVM_VERILATOR_TIMING
    m_reg_process=process::self();
+`endif
 
    if (on) begin
      if (m_reg_process == m_process)
        return;
+`ifdef UVM_VERILATOR_TIMING
      m_atomic.get(1);
+`endif
      m_process = m_reg_process; 
    end
    else begin
       // Maybe a key was put back in by a spurious call to reset()
       void'(m_atomic.try_get(1));
+`ifdef UVM_VERILATOR_TIMING
       m_atomic.put(1);
+`endif
       m_process = null;
    end
 endtask: XatomicX

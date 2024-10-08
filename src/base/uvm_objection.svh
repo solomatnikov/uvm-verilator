@@ -374,10 +374,14 @@ class uvm_objection extends uvm_report_object;
             m_forked_contexts.delete(obj);
             // Kill the drain
 `ifndef UVM_USE_PROCESS_CONTAINER	   
+`ifdef UVM_VERILATOR_TIMING
             m_drain_proc[obj].kill();
+`endif
             m_drain_proc.delete(obj);
 `else
+`ifdef UVM_VERILATOR_TIMING
             m_drain_proc[obj].p.kill();
+`endif
             m_drain_proc.delete(obj);
 `endif
 	   
@@ -621,10 +625,14 @@ class uvm_objection extends uvm_report_object;
     // running drains have a context and a process
     foreach (m_forked_contexts[o]) begin
 `ifndef UVM_USE_PROCESS_CONTAINER       
+`ifdef UVM_VERILATOR_TIMING
         m_drain_proc[o].kill();
+`endif
         m_drain_proc.delete(o);
 `else
+`ifdef UVM_VERILATOR_TIMING
         m_drain_proc[o].p.kill();
+`endif
         m_drain_proc.delete(o);
 `endif
        
@@ -645,6 +653,7 @@ class uvm_objection extends uvm_report_object;
 
   // background process; when non
   static task m_execute_scheduled_forks();
+`ifdef UVM_VERILATOR_TIMING
     while(1) begin
       wait(m_scheduled_list.size() != 0);
       if(m_scheduled_list.size() != 0) begin
@@ -692,6 +701,7 @@ class uvm_objection extends uvm_report_object;
           join_none : guard
       end
     end
+`endif
   endtask
 
 
@@ -704,8 +714,10 @@ class uvm_objection extends uvm_report_object;
                        int count=1,
                        int in_top_thread=0);
 
+`ifdef UVM_VERILATOR_TIMING
       if (m_drain_time.exists(obj))
         `uvm_delay(m_drain_time[obj])
+`endif
       
       if (m_trace_mode)
         m_report(obj,source_obj,description,count,"all_dropped");
@@ -713,7 +725,9 @@ class uvm_objection extends uvm_report_object;
       all_dropped(obj,source_obj,description, count);
           
           // wait for all_dropped cbs to complete
+`ifdef UVM_VERILATOR_TIMING
       wait fork;
+`endif
 
       /* NOT NEEDED - Any raise would have killed us!
       if(!m_total_count.exists(obj))
@@ -743,9 +757,11 @@ class uvm_objection extends uvm_report_object;
 
   // Forks off the single background process
   static function void m_init_objections();
+`ifdef UVM_VERILATOR_TIMING
     fork 
       uvm_objection::m_execute_scheduled_forks();
     join_none
+`endif
   endfunction
 
   // Function -- NODOCS -- set_drain_time
@@ -862,11 +878,13 @@ class uvm_objection extends uvm_report_object;
      end
 
      m_events[obj].waiters++;
+`ifdef UVM_VERILATOR_TIMING
      case (objt_event)
        UVM_RAISED:      @(m_events[obj].raised);
        UVM_DROPPED:     @(m_events[obj].dropped);
        UVM_ALL_DROPPED: @(m_events[obj].all_dropped);
      endcase
+`endif
      
      m_events[obj].waiters--;
 
@@ -882,10 +900,12 @@ class uvm_objection extends uvm_report_object;
 
      if(!m_total_count.exists(obj) && count == 0)
        return;
+`ifdef UVM_VERILATOR_TIMING
      if (count == 0)
         wait (!m_total_count.exists(obj) && count == 0);
      else
         wait (m_total_count.exists(obj) && m_total_count[obj] == count);
+`endif
    endtask
    
 

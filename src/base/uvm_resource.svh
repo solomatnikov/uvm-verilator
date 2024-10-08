@@ -465,11 +465,13 @@ class uvm_resource_pool;
 
      // ensure rand stability during lookup
      begin
+`ifdef UVM_VERILATOR_TIMING
 	process p = process::self();
 	string s;
 	if(p!=null) s=p.get_randstate();
 	q=new();
 	if(p!=null) p.set_randstate(s);
+`endif
      end
 
      

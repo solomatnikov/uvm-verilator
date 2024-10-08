@@ -359,12 +359,16 @@ class uvm_report_message_element_container extends uvm_object;
      string rand_state;
      uvm_report_message_int_element urme;
 
+`ifdef UVM_VERILATOR_TIMING
      p = process::self();
      if (p != null)
        rand_state = p.get_randstate();
+`endif
      urme = new();
+`ifdef UVM_VERILATOR_TIMING
      if (p != null)
        p.set_randstate(rand_state);
+`endif
 
      urme.set_name(name);
      urme.set_value(value, size, radix);
@@ -386,12 +390,16 @@ class uvm_report_message_element_container extends uvm_object;
      string rand_state;
      uvm_report_message_string_element urme;
 
+`ifdef UVM_VERILATOR_TIMING
      p = process::self();
      if (p != null)
        rand_state = p.get_randstate();
+`endif
      urme = new();
+`ifdef UVM_VERILATOR_TIMING
      if (p != null)
        p.set_randstate(rand_state);
+`endif
 
      urme.set_name(name);
      urme.set_value(value);
@@ -413,12 +421,16 @@ class uvm_report_message_element_container extends uvm_object;
      string rand_state;
      uvm_report_message_object_element urme;
 
+`ifdef UVM_VERILATOR_TIMING
      p = process::self();
      if (p != null)
        rand_state = p.get_randstate();
+`endif
      urme = new();
+`ifdef UVM_VERILATOR_TIMING
      if (p != null)
        p.set_randstate(rand_state);
+`endif
 
      urme.set_name(name);
      urme.set_value(obj);
@@ -518,13 +530,17 @@ class uvm_report_message extends uvm_object;
     process p;
     string rand_state;
 
+`ifdef UVM_VERILATOR_TIMING
     p = process::self();
 
     if (p != null)
       rand_state = p.get_randstate();
+`endif
     new_report_message = new(name);
+`ifdef UVM_VERILATOR_TIMING
     if (p != null)
       p.set_randstate(rand_state);
+`endif
 
   endfunction
 

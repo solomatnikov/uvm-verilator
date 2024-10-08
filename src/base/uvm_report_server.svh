@@ -562,7 +562,9 @@ class uvm_default_report_server extends uvm_report_server;
   virtual function void process_report_message(uvm_report_message report_message);
 
     uvm_report_handler l_report_handler = report_message.get_report_handler();
+`ifdef UVM_VERILATOR_TIMING
     	process p = process::self();
+`endif
     bit report_ok = 1;
 
     // Set the report server for this message
@@ -604,7 +606,9 @@ class uvm_default_report_server extends uvm_report_server;
   virtual function void execute_report_message(uvm_report_message report_message,
                                                string composed_message);
                                                
+`ifdef UVM_VERILATOR_TIMING
                                                process p = process::self();
+`endif
                                                
     // Update counts 
     incr_severity_count(report_message.get_severity());

@@ -317,7 +317,9 @@ class uvm_report_handler extends uvm_object;
 
   // @uvm-ieee 1800.2-2017 auto 6.4.7
   virtual function void process_report_message(uvm_report_message report_message);
+`ifdef UVM_VERILATOR_TIMING
     process p = process::self();
+`endif
     uvm_report_server srvr = uvm_report_server::get_server();
     string id = report_message.get_id();
     uvm_severity severity = report_message.get_severity();

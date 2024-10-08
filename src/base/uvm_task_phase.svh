@@ -131,6 +131,7 @@ virtual class uvm_task_phase extends uvm_phase;
   virtual function void execute(uvm_component comp,
                                           uvm_phase phase);
 
+`ifdef UVM_VERILATOR_TIMING
     fork
       begin
         process proc;
@@ -147,6 +148,7 @@ virtual class uvm_task_phase extends uvm_phase;
 
       end
     join_none
+`endif
 
   endfunction
 endclass

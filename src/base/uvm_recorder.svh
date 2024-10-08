@@ -211,8 +211,10 @@ virtual class uvm_recorder extends uvm_policy;
 
    // @uvm-ieee 1800.2-2017 auto 16.4.4.3
    function void free(time close_time = 0);
+`ifdef UVM_VERILATOR_TIMING
 	   process p=process::self();
 	   string s;
+`endif
 	
        uvm_tr_stream stream;
        
@@ -229,11 +231,15 @@ virtual class uvm_recorder extends uvm_policy;
       stream = get_stream();
       
       m_is_closed = 0;
+`ifdef UVM_VERILATOR_TIMING
       if(p != null)
       	s=p.get_randstate();
+`endif
       m_stream_dap = new("stream_dap");
+`ifdef UVM_VERILATOR_TIMING
       if(p != null)
       	p.set_randstate(s);
+`endif
       m_warn_null_stream = 1;
       if (m_ids_by_recorder.exists(this))
         m_free_id(m_ids_by_recorder[this]);

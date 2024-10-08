@@ -1341,8 +1341,10 @@ task uvm_phase::execute_phase();
   // all its predecessor nodes to be marked DONE.
   // (the next conditional speeds this up)
   // Also, this helps us fast-forward through terminal (end) nodes
+`ifdef UVM_VERILATOR_TIMING
   foreach (m_predecessors[pred])
     wait (pred.m_state == UVM_PHASE_DONE);
+`endif
 
 
   // If DONE (by, say, a forward jump), return immed
@@ -1366,13 +1368,17 @@ task uvm_phase::execute_phase();
   state_chg.m_prev_state = m_state;
   m_state = UVM_PHASE_SYNCING;
   `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
+`ifdef UVM_VERILATOR_TIMING
   #0;
+`endif
    
   if (m_sync.size()) begin
     
+`ifdef UVM_VERILATOR_TIMING
     foreach (m_sync[i]) begin
       wait (m_sync[i].m_state >= UVM_PHASE_SYNCING);
     end
+`endif
   end
 
   m_run_count++;
@@ -1389,13 +1395,17 @@ task uvm_phase::execute_phase();
     m_state = UVM_PHASE_STARTED;
     `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
 
+`ifdef UVM_VERILATOR_TIMING
     #0;
+`endif
 
     state_chg.m_prev_state = m_state;
     m_state = UVM_PHASE_EXECUTING;
     `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
 
+`ifdef UVM_VERILATOR_TIMING
     #0;
+`endif
   end
 
 
@@ -1410,7 +1420,9 @@ task uvm_phase::execute_phase();
 
     m_imp.traverse(top,this,UVM_PHASE_STARTED);
     m_ready_to_end_count = 0 ; // reset the ready_to_end count when phase starts
+`ifdef UVM_VERILATOR_TIMING
     #0; // LET ANY WAITERS WAKE UP
+`endif
 
 
     //if (m_imp.get_phase_type() != UVM_PHASE_TASK) begin
@@ -1423,7 +1435,9 @@ task uvm_phase::execute_phase();
       m_state = UVM_PHASE_EXECUTING;
       `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
 
+`ifdef UVM_VERILATOR_TIMING
       #0; // LET ANY WAITERS WAKE UP
+`endif
       m_imp.traverse(top,this,UVM_PHASE_EXECUTING);
 
     end
@@ -1434,6 +1448,7 @@ task uvm_phase::execute_phase();
         m_state = UVM_PHASE_EXECUTING;
         `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
 
+`ifdef UVM_VERILATOR_TIMING
         fork : master_phase_process
           begin
   
@@ -1448,10 +1463,12 @@ task uvm_phase::execute_phase();
   
           end
         join_none
+`endif
   
         uvm_wait_for_nba_region(); //Give sequences, etc. a chance to object
   
         // Now wait for one of three criterion for end-of-phase.
+`ifdef UVM_VERILATOR_TIMING
         fork
           begin // guard
           
@@ -1565,6 +1582,7 @@ task uvm_phase::execute_phase();
           end
   
         join // guard
+`endif
 
     end
 
@@ -1605,7 +1623,9 @@ task uvm_phase::execute_phase();
       end
   
   
+`ifdef UVM_VERILATOR_TIMING
       #0; // LET ANY WAITERS ON READY_TO_END TO WAKE UP
+`endif
       if (m_phase_trace)
         `UVM_PH_TRACE("PH_END","ENDING PHASE PREMATURELY",this,UVM_HIGH)
     end
@@ -1627,7 +1647,9 @@ task uvm_phase::execute_phase();
     `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
     if (m_imp != null)
       m_imp.traverse(top,this,UVM_PHASE_ENDED);
+`ifdef UVM_VERILATOR_TIMING
     #0; // LET ANY WAITERS WAKE UP
+`endif
   
   
     //---------
@@ -1639,10 +1661,14 @@ task uvm_phase::execute_phase();
     else m_state = UVM_PHASE_CLEANUP ;
     `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
     if (m_phase_proc != null) begin
+`ifdef UVM_VERILATOR_TIMING
       m_phase_proc.kill();
+`endif
       m_phase_proc = null;
     end
+`ifdef UVM_VERILATOR_TIMING
     #0; // LET ANY WAITERS WAKE UP
+`endif
     begin
       uvm_objection objection = get_objection();
       if (objection != null)
@@ -1668,9 +1694,13 @@ task uvm_phase::execute_phase();
     m_state = UVM_PHASE_DONE;
     `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(this, state_chg))
     m_phase_proc = null;
+`ifdef UVM_VERILATOR_TIMING
     #0; // LET ANY WAITERS WAKE UP
+`endif
   end
+`ifdef UVM_VERILATOR_TIMING
   #0; // LET ANY WAITERS WAKE UP
+`endif
   begin
     uvm_objection objection;
     objection = get_objection();
@@ -1699,7 +1729,9 @@ task uvm_phase::execute_phase();
         state_chg.m_phase = succ;
         succ.m_state = UVM_PHASE_SCHEDULED;
         `uvm_do_callbacks(uvm_phase, uvm_phase_cb, phase_state_change(succ, state_chg))
+`ifdef UVM_VERILATOR_TIMING
         #0; // LET ANY WAITERS WAKE UP
+`endif
         void'(m_phase_hopper.try_put(succ));
         if (m_phase_trace)
           `UVM_PH_TRACE("PH/TRC/SCHEDULED",{"Scheduled from phase ",get_full_name()},succ,UVM_LOW)
@@ -1845,7 +1877,9 @@ task uvm_phase::m_wait_for_pred();
       end
     end
 
+`ifdef UVM_VERILATOR_TIMING
   #0; // LET ANY WAITERS WAKE UP
+`endif
 
 endtask
 
@@ -2035,6 +2069,7 @@ endfunction
 //---------------
   
 task uvm_phase::wait_for_state(uvm_phase_state state, uvm_wait_op op=UVM_EQ);
+`ifdef UVM_VERILATOR_TIMING
   case (op)
     UVM_EQ:  wait((state&m_state) != 0);
     UVM_NE:  wait((state&m_state) == 0);
@@ -2043,6 +2078,7 @@ task uvm_phase::wait_for_state(uvm_phase_state state, uvm_wait_op op=UVM_EQ);
     UVM_GT:  wait(m_state >  state);
     UVM_GTE: wait(m_state >= state);
   endcase
+`endif
 endtask
 
 
@@ -2230,7 +2266,9 @@ function void uvm_phase::kill();
   `uvm_info("PH_KILL", {"killing phase '", get_name(),"'"}, UVM_DEBUG)
 
   if (m_phase_proc != null) begin
+`ifdef UVM_VERILATOR_TIMING
     m_phase_proc.kill();
+`endif
     m_phase_proc = null;
   end
 
@@ -2268,6 +2306,7 @@ task uvm_phase::m_run_phases();
   end
 
   m_uvm_core_state=UVM_CORE_RUNNING;
+`ifdef UVM_VERILATOR_TIMING
   forever begin
     uvm_phase phase;
     m_phase_hopper.get(phase);
@@ -2278,6 +2317,7 @@ task uvm_phase::m_run_phases();
     join_none
     #0;  // let the process start running
   end
+`endif
 endtask
 
 

@@ -176,12 +176,16 @@ virtual class uvm_tr_stream extends uvm_object;
       // Clear out internal state
       db = get_db();
       m_is_closed = 0;
+`ifdef UVM_VERILATOR_TIMING
       p = process::self();
       if(p != null)
       	s = p.get_randstate();
+`endif
       m_cfg_dap = new("cfg_dap");
+`ifdef UVM_VERILATOR_TIMING
       if(p != null)
       	p.set_randstate(s);
+`endif
       m_warn_null_cfg = 1;
       if (m_ids_by_stream.exists(this))
         m_free_id(m_ids_by_stream[this]);
@@ -268,11 +272,13 @@ virtual class uvm_tr_stream extends uvm_object;
       if (!is_open())
         return null;
       else begin
+`ifdef UVM_VERILATOR_TIMING
          process p = process::self();
          string s;
 
          if (p != null)
            s = p.get_randstate();
+`endif
          
          open_recorder = do_open_recorder(name,
                                           m_time,
@@ -284,8 +290,10 @@ virtual class uvm_tr_stream extends uvm_object;
             m_records[open_recorder] = 1;
             open_recorder.m_do_open(this, m_time, type_name);
          end
+`ifdef UVM_VERILATOR_TIMING
          if (p != null)
            p.set_randstate(s); 
+`endif
       end
    endfunction : open_recorder
 

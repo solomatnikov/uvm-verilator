@@ -208,9 +208,11 @@ class uvm_heartbeat extends uvm_object;
   function void m_start_hb_process();
     if(m_started) return;
     m_started = 1;
+`ifdef UVM_VERILATOR_TIMING
     fork
       m_hb_process;
     join_none
+`endif
   endfunction
 
   protected bit m_added;
@@ -230,6 +232,7 @@ class uvm_heartbeat extends uvm_object;
     uvm_object obj;
     bit  triggered;
     time last_trigger=0;
+`ifdef UVM_VERILATOR_TIMING
     fork
       begin
         // The process waits for the event trigger. The first trigger is
@@ -294,6 +297,7 @@ class uvm_heartbeat extends uvm_object;
       @(m_stop_event);
     join_any
     disable fork;
+`endif
   endtask
 endclass
 

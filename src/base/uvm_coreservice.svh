@@ -224,17 +224,23 @@ class uvm_default_coreservice_t extends uvm_coreservice_t;
 	// is called, returns an instance of <uvm_text_tr_database>
 	virtual function uvm_tr_database get_default_tr_database();
 		if (tr_database == null) begin
+`ifdef UVM_VERILATOR_TIMING
 			process p = process::self();
+`endif
 			uvm_text_tr_database tx_db;
 			string s;
+`ifdef UVM_VERILATOR_TIMING
 			if(p != null)
 				s = p.get_randstate();
+`endif
 
 			tx_db = new("default_tr_database");
 			tr_database = tx_db;
 
+`ifdef UVM_VERILATOR_TIMING
 			if(p != null)
 				p.set_randstate(s);
+`endif
 		end
 		return tr_database;
 	endfunction : get_default_tr_database

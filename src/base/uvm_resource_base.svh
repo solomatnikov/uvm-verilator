@@ -316,7 +316,9 @@ virtual class uvm_resource_base extends uvm_object;
 
   // @uvm-ieee 1800.2-2017 auto C.2.3.4
   task wait_modified();
+`ifdef UVM_VERILATOR_TIMING
     wait (modified == 1);
+`endif
     modified = 0;
   endtask
 

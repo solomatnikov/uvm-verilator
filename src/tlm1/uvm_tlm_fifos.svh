@@ -110,19 +110,25 @@ class uvm_tlm_fifo #(type T=int) extends uvm_tlm_fifo_base #(T);
 
 
   virtual task put( input T t );
+`ifdef UVM_VERILATOR_TIMING
     m.put( t );
+`endif
     put_ap.write( t );
   endtask
 
   virtual task get( output T t );
     m_pending_blocked_gets++;
+`ifdef UVM_VERILATOR_TIMING
     m.get( t );
+`endif
     m_pending_blocked_gets--;
     get_ap.write( t );
   endtask
   
   virtual task peek( output T t );
+`ifdef UVM_VERILATOR_TIMING
     m.peek( t );
+`endif
   endtask
    
   virtual function bit try_get( output T t );

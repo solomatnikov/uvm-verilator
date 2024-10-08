@@ -219,7 +219,9 @@ function void uvm_process_report_message(uvm_report_message report_message);
   uvm_root top;
   uvm_coreservice_t cs;
   process p;
+`ifdef UVM_VERILATOR_TIMING
   p = process::self();
+`endif
   cs = uvm_coreservice_t::get();
   top = cs.get_root();
   top.uvm_process_report_message(report_message);
@@ -428,8 +430,10 @@ task uvm_wait_for_nba_region;
   //but it isn't needed since program blocks are in a separate region.
 `ifndef UVM_NO_WAIT_FOR_NBA
   next_nba++;
+`ifdef UVM_VERILATOR_TIMING
   nba <= next_nba;
   @(nba);
+`endif
 `else
   repeat(`UVM_POUND_ZERO_COUNT) #0;
 `endif

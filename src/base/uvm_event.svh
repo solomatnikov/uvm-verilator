@@ -72,11 +72,15 @@ virtual class uvm_event_base extends uvm_object;
 	virtual task wait_on (bit delta = 0);
 		if (on) begin
 			if (delta)
+`ifdef UVM_VERILATOR_TIMING
 				#0;
+`endif
 			return;
 		end
 		num_waiters++;
+`ifdef UVM_VERILATOR_TIMING
 		@on;
+`endif
 	endtask
 
 
@@ -94,11 +98,15 @@ virtual class uvm_event_base extends uvm_object;
 	virtual task wait_off (bit delta = 0);
 		if (!on) begin
 			if (delta)
+`ifdef UVM_VERILATOR_TIMING
 				#0;
+`endif
 			return;
 		end
 		num_waiters++;
+`ifdef UVM_VERILATOR_TIMING
 		@on;
+`endif
 	endtask
 
 
@@ -115,7 +123,9 @@ virtual class uvm_event_base extends uvm_object;
 	// @uvm-ieee 1800.2-2017 auto 10.1.1.2.4
 	virtual task wait_trigger ();
 		num_waiters++;
+`ifdef UVM_VERILATOR_TIMING
 		@m_event;
+`endif
 	endtask
 
 
@@ -131,7 +141,9 @@ virtual class uvm_event_base extends uvm_object;
 		if (m_event.triggered)
 			return;
 		num_waiters++;
+`ifdef UVM_VERILATOR_TIMING
 		@m_event;
+`endif
 	endtask
 
 

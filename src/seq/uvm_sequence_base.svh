@@ -241,7 +241,9 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
 
   // @uvm-ieee 1800.2-2017 auto 14.2.2.5
   task wait_for_sequence_state(int unsigned state_mask);
+`ifdef UVM_VERILATOR_TIMING
     wait (m_sequence_state & state_mask);
+`endif
   endtask
 
 
@@ -342,6 +344,7 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
     // Change the state to PRE_START, do this before the fork so that
     // the "if (!(m_sequence_state inside {...}" works
     m_sequence_state = UVM_PRE_START;
+`ifdef UVM_VERILATOR_TIMING
     fork
       begin
         m_sequence_process = process::self();
@@ -399,6 +402,7 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
 
       end
     join
+`endif
 
     if (m_sequencer != null) begin
       m_sequencer.end_tr(this);
@@ -410,7 +414,9 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
        clean_exit_sequence();
     end
 
+`ifdef UVM_VERILATOR_TIMING
     #0; // allow stopped and finish waiters to resume
+`endif
 
     if ((m_parent_sequence != null) && (m_parent_sequence.children_array.exists(this))) begin
        m_parent_sequence.children_array.delete(this);
@@ -707,7 +713,9 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
     if (is_rel_default != wait_rel_default)
       uvm_report_fatal("RELMSM",
         "is_relevant() was implemented without defining wait_for_relevant()", UVM_NONE);
+`ifdef UVM_VERILATOR_TIMING
     @e;  // this is intended to never return
+`endif
   endtask
 
 
@@ -879,7 +887,9 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
        i.kill();
     end
     if (m_sequence_process != null) begin
+`ifdef UVM_VERILATOR_TIMING
       m_sequence_process.kill;
+`endif
       m_sequence_process = null;
     end
     m_sequence_state = UVM_STOPPED;
@@ -1213,8 +1223,10 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
 
     int queue_size, i;
 
+`ifdef UVM_VERILATOR_TIMING
     if (response_queue.size() == 0)
       wait (response_queue.size() != 0);
+`endif
 
     if (transaction_id == -1) begin
       response = response_queue.pop_front();
@@ -1231,7 +1243,9 @@ virtual class uvm_sequence_base extends uvm_sequence_item;
             return;
           end
       end
+`ifdef UVM_VERILATOR_TIMING
       wait (response_queue.size() != queue_size);
+`endif
     end
   endtask
 

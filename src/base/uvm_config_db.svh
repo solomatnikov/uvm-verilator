@@ -162,9 +162,11 @@ class uvm_config_db#(type T=int) extends uvm_resource_db#(T);
     int unsigned precedence;
      
     //take care of random stability during allocation
+`ifdef UVM_VERILATOR_TIMING
     process p = process::self();
     if(p != null) 
   		rstate = p.get_randstate();
+`endif
   		
     top = cs.get_root();
 
@@ -218,8 +220,10 @@ class uvm_config_db#(type T=int) extends uvm_resource_db#(T);
       end
     end
 
+`ifdef UVM_VERILATOR_TIMING
     if(p != null)
     	p.set_randstate(rstate);
+`endif
 
     if(uvm_config_db_options::is_tracing())
       m_show_msg("CFGDB/SET", "Configuration","set", inst_name, field_name, cntxt, r);
@@ -263,8 +267,10 @@ class uvm_config_db#(type T=int) extends uvm_resource_db#(T);
   // @uvm-ieee 1800.2-2017 auto C.4.2.2.4
   static task wait_modified(uvm_component cntxt, string inst_name,
       string field_name);
+`ifdef UVM_VERILATOR_TIMING
     process p = process::self();
     string rstate = p.get_randstate();
+`endif
     m_uvm_waiter waiter;
     uvm_coreservice_t cs = uvm_coreservice_t::get();
 
@@ -283,10 +289,12 @@ class uvm_config_db#(type T=int) extends uvm_resource_db#(T);
       m_waiters[field_name] = new;
     m_waiters[field_name].push_back(waiter);
 
+`ifdef UVM_VERILATOR_TIMING
     p.set_randstate(rstate);
 
     // wait on the waiter to trigger
     @waiter.trigger;
+`endif
   
     // Remove the waiter from the waiter list 
     for(int i=0; i<m_waiters[field_name].size(); ++i) begin

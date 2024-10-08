@@ -103,11 +103,13 @@ virtual class uvm_tr_database extends uvm_object;
          return null;
       end
       else begin
+`ifdef UVM_VERILATOR_TIMING
          process p = process::self();
          string s;
 
          if (p != null)
            s = p.get_randstate();
+`endif
 
          open_stream = do_open_stream(name, scope, type_name);
 
@@ -117,8 +119,10 @@ virtual class uvm_tr_database extends uvm_object;
             open_stream.m_do_open(this, scope, type_name);
          end
          
+`ifdef UVM_VERILATOR_TIMING
          if (p != null)
            p.set_randstate(s);
+`endif
 
       end
    endfunction : open_stream

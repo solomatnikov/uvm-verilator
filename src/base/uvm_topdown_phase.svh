@@ -99,8 +99,10 @@ virtual class uvm_topdown_phase extends uvm_phase;
   virtual function void execute(uvm_component comp,
                                           uvm_phase phase);
     // reseed this process for random stability
+`ifdef UVM_VERILATOR_TIMING
     process proc = process::self();
     proc.srandom(uvm_create_random_seed(phase.get_type_name(), comp.get_full_name()));
+`endif
 
     comp.m_current_phase = phase;
     exec_func(comp,phase);

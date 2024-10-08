@@ -563,13 +563,17 @@ virtual class uvm_report_catcher extends uvm_callback;
     catcher = uvm_report_cb::get_first(iter,l_report_object);
     if (catcher != null) begin
       if(m_debug_flags & DO_NOT_MODIFY) begin
+`ifdef UVM_VERILATOR_TIMING
         process p = process::self(); // Keep random stability
         string randstate;
         if (p != null)
           randstate = p.get_randstate();
+`endif
         $cast(m_orig_report_message, rm.clone()); //have to clone, rm can be extended type
+`ifdef UVM_VERILATOR_TIMING
         if (p != null)
           p.set_randstate(randstate);
+`endif
       end
     end
     while(catcher != null) begin

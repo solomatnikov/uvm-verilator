@@ -149,7 +149,9 @@ class uvm_reg_single_access_seq extends uvm_reg_sequence #(uvm_sequence #(uvm_re
                                  "' when writing '",rg.get_full_name(),
                                  "' through map '",maps[j].get_full_name(),"'"})
          end
+`ifdef UVM_VERILATOR_TIMING
          #1;
+`endif
          
          rg.mirror(status, UVM_CHECK, UVM_BACKDOOR, uvm_reg_map::backdoor(), this);
          if (status != UVM_IS_OK) begin

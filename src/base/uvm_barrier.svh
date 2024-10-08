@@ -179,7 +179,9 @@ class uvm_barrier extends uvm_object;
   local task m_trigger();
     m_event.trigger();
     num_waiters=0;
+`ifdef UVM_VERILATOR_TIMING
     #0; //this process was last to wait; allow other procs to resume first
+`endif
   endtask
 
   virtual function void do_print (uvm_printer printer);

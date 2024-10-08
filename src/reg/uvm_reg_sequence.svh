@@ -135,7 +135,9 @@ class uvm_reg_sequence #(type BASE=uvm_sequence #(uvm_reg_item)) extends BASE;
          {"Executing RegModel translation sequence on sequencer ",
        m_sequencer.get_full_name(),"' does not have an upstream sequencer defined. ",
        "Execution of register items available only via direct calls to 'do_reg_item'"})
+`ifdef UVM_VERILATOR_TIMING
       wait(0);
+`endif
     end
     `uvm_info("REG_XLATE_SEQ_START",
        {"Starting RegModel translation sequence on sequencer ",
@@ -145,7 +147,9 @@ class uvm_reg_sequence #(type BASE=uvm_sequence #(uvm_reg_item)) extends BASE;
       reg_seqr.peek(reg_item);
       do_reg_item(reg_item);
       reg_seqr.get(reg_item);
+`ifdef UVM_VERILATOR_TIMING
       #0;
+`endif
     end
   endtask
 

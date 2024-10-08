@@ -131,7 +131,9 @@ class uvm_mem_single_access_seq extends uvm_reg_sequence #(uvm_sequence #(uvm_re
                `uvm_error("uvm_mem_access_seq", $sformatf("Status was %s when writing \"%s[%0d]\" through map \"%s\".",
                                            status.name(), mem.get_full_name(), k, maps[j].get_full_name()))
             end
+`ifdef UVM_VERILATOR_TIMING
             #1;
+`endif
             
             val = 'x;
             mem.peek(status, k, val);

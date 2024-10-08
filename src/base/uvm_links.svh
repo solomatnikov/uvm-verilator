@@ -125,14 +125,18 @@ class uvm_parent_child_link extends uvm_link_base;
       process p_;
       string s_;
 
+`ifdef UVM_VERILATOR_TIMING
       p_ = process::self();
       if (p_ != null)
 	s_ = p_.get_randstate();
+`endif
       
       get_link = new(name);
 
+`ifdef UVM_VERILATOR_TIMING
       if (p_ != null)
 	p_.set_randstate(s_);
+`endif
       
       get_link.set(lhs, rhs);
    endfunction : get_link
@@ -201,14 +205,18 @@ class uvm_cause_effect_link extends uvm_link_base;
                                                  string name="ce_link");
       process p_;
       string s_;
+`ifdef UVM_VERILATOR_TIMING
       p_ = process::self();
       if (p_ != null)
 	s_ = p_.get_randstate();
+`endif
       
       get_link = new(name);
 
+`ifdef UVM_VERILATOR_TIMING
       if (p_ != null)
 	p_.set_randstate(s_);
+`endif
       
       get_link.set(lhs, rhs);
    endfunction : get_link
@@ -277,14 +285,18 @@ class uvm_related_link extends uvm_link_base;
                                                  string name="ce_link");
       process p_;
       string s_;
+`ifdef UVM_VERILATOR_TIMING
       p_ = process::self();
       if (p_ != null)
 	s_ = p_.get_randstate();
+`endif
       
       get_link = new(name);
 
+`ifdef UVM_VERILATOR_TIMING
       if (p_ != null)
 	p_.set_randstate(s_);
+`endif
       
       get_link.set(lhs, rhs);
    endfunction : get_link

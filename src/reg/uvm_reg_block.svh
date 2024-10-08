@@ -213,7 +213,9 @@ class uvm_reg_block extends uvm_object;
    endfunction
    
    virtual task wait_for_lock();
+`ifdef UVM_VERILATOR_TIMING
 	   @m_uvm_lock_model_complete;
+`endif
    endtask
 
 

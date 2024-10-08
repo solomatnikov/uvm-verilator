@@ -193,7 +193,9 @@ class uvm_queue #(type T=int) extends uvm_object;
 
   // @uvm-ieee 1800.2-2017 auto 11.3.2.12
   virtual task wait_until_not_empty();
+`ifdef UVM_VERILATOR_TIMING
       wait(queue.size() > 0);
+`endif
   endtask
 
   virtual function void do_copy (uvm_object rhs);

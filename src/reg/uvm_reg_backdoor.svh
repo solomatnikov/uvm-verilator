@@ -182,6 +182,7 @@ function void uvm_reg_backdoor::start_update_thread(uvm_object element);
    if (!$cast(rg,element))
      return; // only regs supported at this time
 
+`ifdef UVM_VERILATOR_TIMING
    fork
       begin
          uvm_reg_field fields[$];
@@ -216,6 +217,7 @@ function void uvm_reg_backdoor::start_update_thread(uvm_object element);
          end
       end
    join_none
+`endif
 endfunction
 
 
@@ -224,10 +226,12 @@ endfunction
 function void uvm_reg_backdoor::kill_update_thread(uvm_object element);
    if (this.m_update_thread.exists(element)) begin
 
+`ifdef UVM_VERILATOR_TIMING
 `ifdef UVM_USE_PROCESS_CONTAINER
       this.m_update_thread[element].p.kill();
 `else 
       this.m_update_thread[element].kill();
+`endif
 `endif
 
       this.m_update_thread.delete(element);

@@ -526,7 +526,9 @@ task uvm_root::run_test(string test_name="");
 		if(m_children.exists("uvm_test_top")) begin
 			uvm_report_fatal("TTINST",
 				"An uvm_test_top already exists via a previous call to run_test", UVM_NONE);
+`ifdef UVM_VERILATOR_TIMING
 			#0; // forces shutdown because $finish is forked
+`endif
 		end
 		$cast(uvm_test_top, factory.create_component_by_name(test_name,
 				"", "uvm_test_top", null));
@@ -559,6 +561,7 @@ task uvm_root::run_test(string test_name="");
 	end
 
 	// phase runner, isolated from calling process
+`ifdef UVM_VERILATOR_TIMING
 	fork begin
 			// spawn the phase runner task
 			phase_runner_proc = process::self();
@@ -568,11 +571,14 @@ task uvm_root::run_test(string test_name="");
 	#0; // let the phase runner start
 
 	wait (m_phase_all_done == 1);
+`endif
 
 	m_uvm_core_state=UVM_CORE_POST_RUN;
 
 	// clean up after ourselves
+`ifdef UVM_VERILATOR_TIMING
 	phase_runner_proc.kill();
+`endif
 
 	l_rs = uvm_report_server::get_server();
 
